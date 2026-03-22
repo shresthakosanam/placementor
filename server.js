@@ -214,32 +214,34 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Placementor API Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🔍 Analysis endpoint: POST http://localhost:${PORT}/api/analyze`);
-  
-  // Get network IP addresses
-  const { networkInterfaces } = require('os');
-  const nets = networkInterfaces();
-  const results = [];
-  
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      // Skip over non-IPv4 and internal addresses
-      if (net.family === 'IPv4' && !net.internal) {
-        results.push(net.address);
+if (process.env.NODE_ENV !== 'production') {
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Placementor API Server running on port ${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🔍 Analysis endpoint: POST http://localhost:${PORT}/api/analyze`);
+    
+    // Get network IP addresses
+    const { networkInterfaces } = require('os');
+    const nets = networkInterfaces();
+    const results = [];
+    
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+        // Skip over non-IPv4 and internal addresses
+        if (net.family === 'IPv4' && !net.internal) {
+          results.push(net.address);
+        }
       }
     }
-  }
-  
-  if (results.length > 0) {
-    console.log(`📱 Mobile Access URLs:`);
-    results.forEach(ip => {
-      console.log(`   http://${ip}:${PORT}`);
-    });
-  }
-});
+    
+    if (results.length > 0) {
+      console.log(`📱 Mobile Access URLs:`);
+      results.forEach(ip => {
+        console.log(`   http://${ip}:${PORT}`);
+      });
+    }
+  });
+}
 
 // Export for Vercel
 module.exports = app;

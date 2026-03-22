@@ -16,15 +16,11 @@
       "dest": "/results.html"
     },
     {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
       "src": "/(.*)",
       "dest": "/$1"
     }
   ],
   "env": {
-    "PORT": "3001"
+    "NODE_ENV": "production"
   }
 }
