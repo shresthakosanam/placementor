@@ -241,4 +241,5 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   }
 });
 
+// Export for Vercel
 module.exports = app;
