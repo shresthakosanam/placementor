@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placementor - AI-Powered Career Analysis</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --border-color: #2a2a3a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Background Effects */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-gradient::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0 3rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--accent-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+
+        .badge i {
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        h1 .highlight {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .feature-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.625rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .feature-tag:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        label i {
+            color: var(--accent-cyan);
+        }
+
+        label .optional {
+            color: var(--text-secondary);
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        select {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 0.875rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.9375rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input::placeholder {
+            color: #5a5a6a;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* File Upload */
+        .file-upload {
+            position: relative;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            border: 2px dashed var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload:hover .file-upload-label {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .file-upload.has-file .file-upload-label {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* Rating */
+        .rating-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .rating-btn {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .rating-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .rating-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        /* Submit Button */
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analyze-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .analyze-btn:hover::before {
+            left: 100%;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.5);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.625rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .user-info {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .user-info strong {
+            color: var(--text-primary);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Score Circle */
+        .score-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .score-circle {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: var(--bg-card);
+            stroke-width: 12;
+        }
+
+        .score-circle-progress {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .score-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 50px;
+            color: var(--danger);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .score-status.good {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        /* Score Breakdown */
+        .breakdown-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .breakdown-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .breakdown-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+
+        .breakdown-name {
+            color: var(--text-secondary);
+        }
+
+        .breakdown-score {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .breakdown-bar {
+            height: 8px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .breakdown-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .breakdown-fill.red { background: var(--danger); }
+        .breakdown-fill.yellow { background: var(--warning); }
+        .breakdown-fill.green { background: var(--success); }
+
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Skills */
+        .skills-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .skills-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .skills-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .skills-title.have {
+            color: var(--success);
+        }
+
+        .skills-title.need {
+            color: var(--danger);
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            padding: 0.375rem 0.875rem;
+            border-radius: 50px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        .skill-tag.have {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .skill-tag.need {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Projects */
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateX(5px);
+        }
+
+        .project-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .project-desc {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.375rem;
+        }
+
+        .project-tag {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .difficulty {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .difficulty.advanced {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .difficulty.intermediate {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .difficulty.beginner {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        /* Courses */
+        .course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .course-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .course-info h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .course-info span {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+
+        .priority {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .priority.high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .priority.medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* Tips List */
+        .tips-list {
+            list-style: none;
+        }
+
+        .tips-list li {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            margin-bottom: 0.875rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        .tips-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .tips-list i {
+            color: var(--warning);
+            margin-top: 0.25rem;
+        }
+
+        /* Experience Suggestions */
+        .exp-list {
+            list-style: none;
+        }
+
+        .exp-list li {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        .exp-list i {
+            color: var(--accent-cyan);
+            margin-top: 0.25rem;
+        }
+
+        /* Portfolio Status */
+        .portfolio-alert {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--warning);
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .portfolio-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Roadmap */
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .roadmap-card {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-blue);
+            border-radius: 0 0.75rem 0.75rem 0;
+            padding: 1.25rem;
+        }
+
+        .roadmap-card:nth-child(2) { border-left-color: var(--success); }
+        .roadmap-card:nth-child(3) { border-left-color: var(--warning); }
+        .roadmap-card:nth-child(4) { border-left-color: var(--danger); }
+
+        .roadmap-week {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-cyan);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .roadmap-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .roadmap-tasks {
+            list-style: none;
+        }
+
+        .roadmap-tasks li {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .roadmap-tasks li::before {
+            content: '•';
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 1rem;
+            }
+            .form-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <div class="container">
+        <!-- Input Form Section -->
+        <div id="inputSection" class="input-section">
+            <div class="hero">
+                <div class="badge">
+                    <i class="fas fa-sparkles"></i>
+                    AI-Powered Career Analysis
+                </div>
+                <h1>Become <span class="highlight">100% Placement Ready</span></h1>
+                <p class="subtitle">Analyze your GitHub, resume, coding profiles, and skills to get a personalized readiness score with actionable insights.</p>
+                
+                <div class="features">
+                    <div class="feature-tag">
+                        <i class="fas fa-bolt" style="color: var(--accent-cyan);"></i>
+                        Instant Analysis
+                    </div>
+                    <div class="feature-tag">
+                        <i class="fas fa-chart-bar" style="color: var(--accent-blue);"></i>
+                        Score Breakdown
+                    </div>
+                    <div class="feature-tag">
+                        <i class="fas fa-map" style="color: var(--accent-purple);"></i>
+                        Personalized Roadmap
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <form id="analysisForm">
+                    <div class="form-group">
+                        <label>
+                            <i class="fab fa-github"></i>
+                            GitHub Username
+                        </label>
+                        <input type="text" id="github" placeholder="e.g., johndoe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fab fa-linkedin"></i>
+                            LinkedIn URL <span class="optional">(optional)</span>
+                        </label>
+                        <input type="url" id="linkedin" placeholder="https://linkedin.com/in/username">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-file-pdf"></i>
+                            Resume Upload
+                        </label>
+                        <div class="file-upload" id="fileUpload">
+                            <input type="file" id="resume" accept=".pdf,.doc,.docx" required>
+                            <div class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span id="fileName">Drop your resume here or click to browse</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-code"></i>
+                                LeetCode Username
+                            </label>
+                            <input type="text" id="leetcode" placeholder="e.g., johndoe">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-laptop-code"></i>
+                                CodeChef Username
+                            </label>
+                            <input type="text" id="codechef" placeholder="e.g., johndoe">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-bullseye"></i>
+                            Target Role
+                        </label>
+                        <select id="targetRole" required>
+                            <option value="">Select your target role</option>
+                            <option value="sde">Software Development Engineer</option>
+                            <option value="frontend">Frontend Developer</option>
+                            <option value="backend">Backend Developer</option>
+                            <option value="fullstack">Full Stack Developer</option>
+                            <option value="data">Data Scientist</option>
+                            <option value="devops">DevOps Engineer</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-comments"></i>
+                            Communication Skills <span class="optional">(1-5 self-rating)</span>
+                        </label>
+                        <div class="rating-container">
+                            <button type="button" class="rating-btn" data-value="1">1</button>
+                            <button type="button" class="rating-btn" data-value="2">2</button>
+                            <button type="button" class="rating-btn" data-value="3">3</button>
+                            <button type="button" class="rating-btn" data-value="4">4</button>
+                            <button type="button" class="rating-btn active" data-value="5">5</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="analyze-btn">
+                        Analyze Profile
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="loading">
+            <div class="spinner"></div>
+            <h3>Analyzing your profile...</h3>
+            <p style="color: var(--text-secondary); margin-top: 0.5rem;">This may take a few moments</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results">
+            <div class="results-header">
+                <button class="back-btn" onclick="resetForm()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </button>
+                <div class="user-info">
+                    Analysis for <strong id="resultUsername">username</strong> — <span id="resultRole">SDE</span>
+                </div>
+            </div>
+
+            <!-- SVG Gradient Definition -->
+            <svg width="0" height="0">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="score-container">
+                        <div class="score-circle">
+                            <svg width="180" height="180">
+                                <circle class="score-circle-bg" cx="90" cy="90" r="78"></circle>
+                                <circle class="score-circle-progress" cx="90" cy="90" r="78" 
+                                    stroke-dasharray="490" 
+                                    stroke-dashoffset="490"
+                                    id="scoreCircle"></circle>
+                            </svg>
+                            <div class="score-text">
+                                <div class="score-value" id="totalScore">0%</div>
+                                <div class="score-label">Readiness Score</div>
+                            </div>
+                        </div>
+                        <div class="score-status" id="scoreStatus">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Needs Improvement</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Score Breakdown</h3>
+                    <div class="breakdown-list">
+                        <div class="breakdown-item">
+                            <div class="breakdown-header">
+                                <span class="breakdown-name">Projects</span>
+                                <span class="breakdown-score">0% (25%)</span>
+                            </div>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill red" style="width: 0%" data-width="0%"></div>
+                            </div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-header">
+                                <span class="breakdown-name">Skills</span>
+                                <span class="breakdown-score">27% (20%)</span>
+                            </div>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill red" style="width: 27%" data-width="27%"></div>
+                            </div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-header">
+                                <span class="breakdown-name">DSA / Coding</span>
+                                <span class="breakdown-score">60% (20%)</span>
+                            </div>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill yellow" style="width: 60%" data-width="60%"></div>
+                            </div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-header">
+                                <span class="breakdown-name">Resume Quality</span>
+                                <span class="breakdown-score">45% (15%)</span>
+                            </div>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill red" style="width: 45%" data-width="45%"></div>
+                            </div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-header">
+                                <span class="breakdown-name">Experience</span>
+                                <span class="breakdown-score">15% (10%)</span>
+                            </div>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill red" style="width: 15%" data-width="15%"></div>
+                            </div>
+                        </div>
+                        <div class="breakdown-item">
+                            <div class="breakdown-header">
+                                <span class="breakdown-name">Communication</span>
+                                <span class="breakdown-score">100% (10%)</span>
+                            </div>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill green" style="width: 100%" data-width="100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <h3 class="card-title">Skill Gap Analysis</h3>
+                    
+                    <div class="skills-section">
+                        <div class="skills-title have">
+                            <i class="fas fa-check-circle"></i>
+                            Skills You Have
+                        </div>
+                        <div class="skills-list">
+                            <span class="skill-tag have">Algorithms</span>
+                            <span class="skill-tag have">C++</span>
+                            <span class="skill-tag have">Git</span>
+                        </div>
+                    </div>
+
+                    <div class="skills-section">
+                        <div class="skills-title need">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Skills to Learn
+                        </div>
+                        <div class="skills-list">
+                            <span class="skill-tag need">Data Structures</span>
+                            <span class="skill-tag need">System Design</span>
+                            <span class="skill-tag need">Java</span>
+                            <span class="skill-tag need">Python</span>
+                            <span class="skill-tag need">SQL</span>
+                            <span class="skill-tag need">Linux</span>
+                            <span class="skill-tag need">Rest Api</span>
+                            <span class="skill-tag need">Docker</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">
+                        <i class="fas fa-rocket" style="color: var(--accent-cyan);"></i>
+                        Recommended Projects
+                    </h3>
+                    
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div>
+                                <div class="project-name">E-Commerce Platform</div>
+                                <div class="project-desc">Full-stack e-commerce app with auth, payments, and inventory management</div>
+                            </div>
+                            <span class="difficulty advanced">advanced</span>
+                        </div>
+                        <div class="project-tags">
+                            <span class="project-tag">react</span>
+                            <span class="project-tag">node.js</span>
+                            <span class="project-tag">mongodb</span>
+                            <span class="project-tag">rest api</span>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div>
+                                <div class="project-name">REST API Backend</div>
+                                <div class="project-desc">RESTful API with authentication, CRUD operations, and documentation</div>
+                            </div>
+                            <span class="difficulty intermediate">intermediate</span>
+                        </div>
+                        <div class="project-tags">
+                            <span class="project-tag">node.js</span>
+                            <span class="project-tag">express</span>
+                            <span class="project-tag">mongodb</span>
+                            <span class="project-tag">rest api</span>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div>
+                                <div class="project-name">Data Visualization Dashboard</div>
+                                <div class="project-desc">Interactive charts and graphs from real datasets</div>
+                            </div>
+                            <span class="difficulty intermediate">intermediate</span>
+                        </div>
+                        <div class="project-tags">
+                            <span class="project-tag">python</span>
+                            <span class="project-tag">pandas</span>
+                            <span class="project-tag">javascript</span>
+                            <span class="project-tag">sql</span>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-header">
+                            <div>
+                                <div class="project-name">URL Shortener Service</div>
+                                <div class="project-desc">URL shortening with analytics, click tracking, and custom aliases</div>
+                            </div>
+                            <span class="difficulty beginner">beginner</span>
+                        </div>
+                        <div class="project-tags">
+                            <span class="project-tag">node.js</span>
+                            <span class="project-tag">mongodb</span>
+                            <span class="project-tag">rest api</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i class="fas fa-book-open" style="color: var(--accent-blue);"></i>
+                        Suggested Courses
+                    </h3>
+                    
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>Data Structures & Algorithms</h4>
+                            <span>DSA</span>
+                        </div>
+                        <span class="priority high">high priority</span>
+                    </div>
+
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>System Design for Interviews</h4>
+                            <span>Architecture</span>
+                        </div>
+                        <span class="priority medium">medium priority</span>
+                    </div>
+
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>Java for Interview Prep</h4>
+                            <span>Language</span>
+                        </div>
+                        <span class="priority medium">medium priority</span>
+                    </div>
+
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>Python for Developers</h4>
+                            <span>Language</span>
+                        </div>
+                        <span class="priority medium">medium priority</span>
+                    </div>
+
+                    <div class="course-item">
+                        <div class="course-info">
+                            <h4>SQL & Database Design</h4>
+                            <span>Database</span>
+                        </div>
+                        <span class="priority medium">medium priority</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-alt" style="color: var(--accent-purple);"></i>
+                        Resume Improvement Tips
+                    </h3>
+                    
+                    <ul class="tips-list">
+                        <li>
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Include achievements, certifications, or hackathon wins</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Add 2-3 strong, well-described projects</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Include standard sections: Education, Experience, Skills, Projects</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Consider condensing your resume to 1-2 pages</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <h3 class="card-title">
+                        <i class="fas fa-briefcase" style="color: var(--success);"></i>
+                        Experience Suggestions
+                    </h3>
+                    
+                    <ul class="exp-list">
+                        <li>
+                            <i class="fas fa-arrow-right"></i>
+                            <span>Apply to internships on LinkedIn, Internshala, or AngelList</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-arrow-right"></i>
+                            <span>Take on freelance projects via Upwork or Fiverr to build real-world experience</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-arrow-right"></i>
+                            <span>Contribute to open-source projects on GitHub to demonstrate collaboration skills</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-arrow-right"></i>
+                            <span>Build a personal portfolio website to showcase your work</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">
+                        <i class="fas fa-globe" style="color: var(--accent-cyan);"></i>
+                        Portfolio Status
+                    </h3>
+                    
+                    <div class="portfolio-alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>No portfolio detected</span>
+                    </div>
+                    <p class="portfolio-text">
+                        Build a personal portfolio website to showcase your projects, skills, and achievements. It's one of the most impactful things you can do for placement readiness.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title">
+                    <i class="fas fa-map-marked-alt" style="color: var(--accent-purple);"></i>
+                    Personalized Roadmap
+                </h3>
+                
+                <div class="roadmap-grid">
+                    <div class="roadmap-card">
+                        <div class="roadmap-week">
+                            <i class="fas fa-book"></i>
+                            Week 1-2
+                        </div>
+                        <div class="roadmap-title">Build Core Skills</div>
+                        <ul class="roadmap-tasks">
+                            <li>Complete 1 course on missing technology</li>
+                            <li>Build a small practice project</li>
+                            <li>Study documentation and tutorials</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-card">
+                        <div class="roadmap-week">
+                            <i class="fas fa-code"></i>
+                            Week 3-5
+                        </div>
+                        <div class="roadmap-title">Build Impressive Projects</div>
+                        <ul class="roadmap-tasks">
+                            <li>Start one full-stack project</li>
+                            <li>Deploy it live with documentation</li>
+                            <li>Add it to GitHub with a polished README</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-card">
+                        <div class="roadmap-week">
+                            <i class="fas fa-file-alt"></i>
+                            Week 5-6
+                        </div>
+                        <div class="roadmap-title">Polish Your Resume</div>
+                        <ul class="roadmap-tasks">
+                            <li>Rewrite project descriptions with metrics</li>
+                            <li>Add relevant skills and certifications</li>
+                            <li>Get feedback from peers or mentors</li>
+                        </ul>
+                    </div>
+
+                    <div class="roadmap-card">
+                        <div class="roadmap-week">
+                            <i class="fas fa-briefcase"></i>
+                            Week 6-8
+                        </div>
+                        <div class="roadmap-title">Gain Real Experience</div>
+                        <ul class="roadmap-tasks">
+                            <li>Apply to internships or freelance gigs</li>
+                            <li>Contribute to open-source projects</li>
+                            <li>Build a portfolio website</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dynamic server URL configuration
+        const SERVER_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? `${window.location.protocol}//${window.location.hostname}:3000`
+            : `${window.location.protocol}//${window.location.hostname}:3000`;
+
+        console.log('Server URL:', SERVER_URL);
+        console.log('Current hostname:', window.location.hostname);
+
+        // Rating buttons
+        document.querySelectorAll('.rating-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // File upload
+        const fileInput = document.getElementById('resume');
+        const fileUpload = document.getElementById('fileUpload');
+        const fileName = document.getElementById('fileName');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                fileName.textContent = this.files[0].name;
+                fileUpload.classList.add('has-file');
+            }
+        });
+
+        // Form submission
+        document.getElementById('analysisForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('github', document.getElementById('github').value);
+            formData.append('linkedin', document.getElementById('linkedin').value);
+            formData.append('leetcode', document.getElementById('leetcode').value);
+            formData.append('codechef', document.getElementById('codechef').value);
+            formData.append('targetRole', document.getElementById('targetRole').value);
+            formData.append('communication', document.querySelector('.rating-btn.active').dataset.value);
+            
+            const resumeFile = document.getElementById('resume').files[0];
+            if (resumeFile) {
+                formData.append('resume', resumeFile);
+            }
+            
+            // Show loading
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('loadingSection').classList.add('active');
+            
+            try {
+                const response = await fetch(`${SERVER_URL}/api/analyze`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Redirect to results page with data
+                    const dataParam = encodeURIComponent(JSON.stringify(result.data));
+                    window.location.href = `/results?data=${dataParam}`;
+                } else {
+                    throw new Error(result.message || 'Analysis failed');
+                }
+            } catch (error) {
+                console.error('Analysis error:', error);
+                alert('Analysis failed: ' + error.message);
+                // Show form again
+                document.getElementById('loadingSection').classList.remove('active');
+                document.getElementById('inputSection').style.display = 'block';
+            }
+        });
+
+        function displayResults(data) {
+            document.getElementById('loadingSection').classList.remove('active');
+            document.getElementById('resultsSection').classList.add('active');
+            
+            // Animate score
+            animateScore(data.totalScore);
+            
+            // Update score breakdown
+            updateScoreBreakdown(data.breakdown);
+            
+            // Update skill gap analysis
+            updateSkillGap(data.skillGap);
+            
+            // Update projects
+            updateProjects(data.recommendations.projects);
+            
+            // Update courses
+            updateCourses(data.recommendations.courses);
+            
+            // Update resume tips
+            updateResumeTips(data.recommendations.resumeTips);
+            
+            // Update experience suggestions
+            updateExperienceSuggestions(data.recommendations.experience);
+            
+            // Update portfolio status
+            updatePortfolioStatus(data.recommendations.portfolio);
+            
+            // Update roadmap
+            updateRoadmap(data.roadmap);
+            
+            // Update score circle
+            const circle = document.getElementById('scoreCircle');
+            const circumference = 2 * Math.PI * 78;
+            const offset = circumference - (data.totalScore / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function updateScoreBreakdown(breakdown) {
+            breakdown.forEach((item, index) => {
+                const breakdownItem = document.querySelectorAll('.breakdown-item')[index];
+                if (breakdownItem) {
+                    const scoreElement = breakdownItem.querySelector('.breakdown-score');
+                    const fillElement = breakdownItem.querySelector('.breakdown-fill');
+                    
+                    scoreElement.textContent = `${item.score}% (${item.weight}%)`;
+                    fillElement.setAttribute('data-width', `${item.score}%`);
+                    
+                    // Set color based on score
+                    fillElement.className = 'breakdown-fill';
+                    if (item.score >= 70) {
+                        fillElement.classList.add('green');
+                    } else if (item.score >= 40) {
+                        fillElement.classList.add('yellow');
+                    } else {
+                        fillElement.classList.add('red');
+                    }
+                }
+            });
+            
+            // Animate progress bars
+            setTimeout(() => {
+                document.querySelectorAll('.breakdown-fill').forEach(fill => {
+                    fill.style.width = fill.getAttribute('data-width');
+                });
+            }, 100);
+        }
+
+        function updateSkillGap(skillGap) {
+            const haveContainer = document.querySelector('.skills-section.have .skills-list');
+            const needContainer = document.querySelector('.skills-section.need .skills-list');
+            
+            haveContainer.innerHTML = skillGap.have.map(skill => 
+                `<span class="skill-tag have">${skill}</span>`
+            ).join('');
+            
+            needContainer.innerHTML = skillGap.need.map(skill => 
+                `<span class="skill-tag need">${skill}</span>`
+            ).join('');
+        }
+
+        function updateProjects(projects) {
+            const container = document.querySelector('.card:has(.project-card)');
+            const projectsContainer = container.querySelector('.project-card').parentElement;
+            
+            projectsContainer.innerHTML = projects.map(project => `
+                <div class="project-card">
+                    <div class="project-header">
+                        <div>
+                            <div class="project-name">${project.name}</div>
+                            <div class="project-desc">${project.description}</div>
+                        </div>
+                        <span class="difficulty ${project.difficulty}">${project.difficulty}</span>
+                    </div>
+                    <div class="project-tags">
+                        ${project.tags.map(tag => `<span class="project-tag">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateCourses(courses) {
+            const container = document.querySelector('.card:has(.course-item)');
+            const coursesContainer = container.querySelector('.course-item').parentElement;
+            
+            coursesContainer.innerHTML = courses.map(course => `
+                <div class="course-item">
+                    <div class="course-info">
+                        <h4>${course.name}</h4>
+                        <span>${course.category}</span>
+                    </div>
+                    <span class="priority ${course.priority}">${course.priority} priority</span>
+                </div>
+            `).join('');
+        }
+
+        function updateResumeTips(tips) {
+            const container = document.querySelector('.tips-list');
+            container.innerHTML = tips.map(tip => `
+                <li>
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${tip}</span>
+                </li>
+            `).join('');
+        }
+
+        function updateExperienceSuggestions(suggestions) {
+            const container = document.querySelector('.exp-list');
+            container.innerHTML = suggestions.map(suggestion => `
+                <li>
+                    <i class="fas fa-arrow-right"></i>
+                    <span>${suggestion}</span>
+                </li>
+            `).join('');
+        }
+
+        function updatePortfolioStatus(portfolio) {
+            const alertElement = document.querySelector('.portfolio-alert');
+            const textElement = document.querySelector('.portfolio-text');
+            
+            alertElement.innerHTML = `
+                <i class="fas fa-${portfolio.alert.includes('good') ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <span>${portfolio.alert}</span>
+            `;
+            
+            textElement.textContent = portfolio.message;
+        }
+
+        function updateRoadmap(roadmap) {
+            const container = document.querySelector('.roadmap-grid');
+            container.innerHTML = roadmap.map((week, index) => `
+                <div class="roadmap-card">
+                    <div class="roadmap-week">
+                        <i class="fas fa-${['book', 'code', 'file-alt', 'briefcase'][index]}"></i>
+                        ${week.week}
+                    </div>
+                    <div class="roadmap-title">${week.title}</div>
+                    <ul class="roadmap-tasks">
+                        ${week.tasks.map(task => `<li>${task}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function animateScore(target) {
+            let current = 0;
+            const element = document.getElementById('totalScore');
+            const increment = target / 50;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current) + '%';
+            }, 20);
+        }
+
+        function resetForm() {
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('inputSection').style.display = 'block';
+            
+            // Reset animations
+            document.getElementById('scoreCircle').style.strokeDashoffset = 490;
+            document.querySelectorAll('.breakdown-fill').forEach(fill => {
+                fill.style.width = '0%';
+            });
+        }
+    </script>
+</body>
+</html>

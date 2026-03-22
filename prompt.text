@@ -1,0 +1,52 @@
+I have a complete frontend for a "Placementor" app. I need you to write the matching backend API.
+
+HERE IS MY FRONTEND CODE - analyze it and build the backend that powers it:
+
+---FRONTEND START---
+[paste the entire HTML code I gave you here]
+---FRONTEND END---
+
+Based on this frontend, create a complete backend with:
+
+TECH STACK: Node.js + Express + MongoDB (or Python + FastAPI + MongoDB if you prefer)
+
+REQUIRED FEATURES:
+1. POST /api/analyze endpoint that accepts:
+   - GitHub username
+   - LinkedIn URL (optional)
+   - Resume file (PDF/DOCX)
+   - LeetCode username (optional)
+   - CodeChef username (optional)
+   - Target role (dropdown: SDE/Frontend/Backend/Fullstack/Data Science/DevOps)
+   - Communication rating (1-5)
+
+2. Backend must:
+   - Fetch GitHub API (repos, stars, languages, activity)
+   - Fetch LeetCode stats (problems solved)
+   - Parse PDF/DOCX resumes (extract text and skills)
+   - Use OpenAI API to generate personalized recommendations
+   - Calculate scores: Projects(25%), Skills(20%), DSA(20%), Resume(15%), Experience(10%), Communication(10%)
+   - Return JSON that matches exactly what my frontend expects
+
+3. Response format must match my frontend's display:
+   - overall_score (0-100)
+   - status ("Needs Improvement"/"Good"/"Excellent")
+   - breakdown object with 6 categories
+   - skill_gap object with have/need arrays
+   - recommended_projects array (4 items)
+   - suggested_courses array (5 items)
+   - resume_tips array (4 strings)
+   - experience_suggestions array (4 strings)
+   - portfolio_status object
+   - roadmap array (4 phases)
+
+4. Include:
+   - All npm packages / requirements
+   - .env.example file
+   - MongoDB models
+   - Error handling
+   - CORS configured for frontend
+   - Docker compose file
+   - README with setup steps
+
+Generate the COMPLETE backend code in a structured folder format I can download and run.
