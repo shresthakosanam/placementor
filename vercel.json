@@ -2,18 +2,34 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
+      "src": "server-simple.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
+      "src": "/api/analyze",
+      "dest": "/server-simple.js"
+    },
+    {
+      "src": "/api/github/(.*)",
+      "dest": "/server-simple.js"
+    },
+    {
+      "src": "/api/coding/(.*)/(.*)",
+      "dest": "/server-simple.js"
+    },
+    {
+      "src": "/api/health",
+      "dest": "/server-simple.js"
     },
     {
       "src": "/results",
       "dest": "/results.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",

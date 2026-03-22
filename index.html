@@ -1407,18 +1407,13 @@
         document.getElementById('analysisForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const formData = new FormData();
+            const formData = new URLSearchParams();
             formData.append('github', document.getElementById('github').value);
             formData.append('linkedin', document.getElementById('linkedin').value);
             formData.append('leetcode', document.getElementById('leetcode').value);
             formData.append('codechef', document.getElementById('codechef').value);
             formData.append('targetRole', document.getElementById('targetRole').value);
             formData.append('communication', document.querySelector('.rating-btn.active').dataset.value);
-            
-            const resumeFile = document.getElementById('resume').files[0];
-            if (resumeFile) {
-                formData.append('resume', resumeFile);
-            }
             
             // Show loading
             document.getElementById('inputSection').style.display = 'none';
@@ -1427,7 +1422,10 @@
             try {
                 const response = await fetch(`${SERVER_URL}/api/analyze`, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData.toString()
                 });
                 
                 const result = await response.json();
